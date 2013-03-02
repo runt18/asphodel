@@ -1,5 +1,7 @@
 package com.heisenberg.asphodel;
 
+import static com.heisenberg.asphodel.RenderConstants.NUM_VERTICES;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.res.Resources.NotFoundException;
+import android.opengl.GLES20;
 import android.util.Xml;
 
 /**
@@ -23,6 +26,7 @@ import android.util.Xml;
  *
  */
 public class Mesh {
+    // Used as temporary storage during DAE parsing
     private class GeomEntry {
         public String id;
         public short[] sdata;
@@ -31,9 +35,9 @@ public class Mesh {
     }
     
     // Raw data
-    private float verts[];
-    private float normals[];
-    private float indices[];
+    //private float verts[];
+    //private float normals[];
+    private short indices[];
     
     // Buffers
     private FloatBuffer vb;
@@ -46,13 +50,39 @@ public class Mesh {
     // Constructor calls file load
     public Mesh(int resID) {
         meshID = resID;
-        System.out.println("Trying to load DAE");
-        loadDAERaw();
+        
+        if (resID != -3) {
+            System.out.println("Trying to load DAE");
+            loadDAERaw();
+        }
+        else {
+            System.out.println("Triangle time");
+            float[] coords = { 0, -1, 0, 1, 1, 0, -1, 1, 0 };
+            ByteBuffer bb = ByteBuffer.allocateDirect(4* coords.length);
+            bb.order(ByteOrder.nativeOrder());
+            vb = bb.asFloatBuffer();
+            vb.put(coords);
+        }
+        
+        GameData.addMesh(this);
     }
     
     // Rendering code
-    public void draw() {
+    public void draw(DrawHelper mDh) {
+        // Set the color
+        GLES20.glUniform4f(mDh.colorHandle, 0.5f, 0.5f, 0.5f, 1.0f);
         
+        // Send in vertex positions
+        vb.position(0);
+        GLES20.glVertexAttribPointer(mDh.vertexHandle, 3, GLES20.GL_FLOAT, false, 0, vb);
+
+        // Send in normals
+        //nb.position(0);
+        //GLES20.glVertexAttribPointer(mDh.normalHandle, 3, GLES20.GL_FLOAT, false, 0, nb);
+        
+        //ib.position(0);
+        //GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, ib);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }
     
     // File loader
@@ -130,6 +160,7 @@ public class Mesh {
                         ge.sdata[i] = Short.parseShort(values[i]);
                     }
                     
+                    indices = ge.sdata;
                     ge.type = "short";
                     
                     geom.add(ge);
