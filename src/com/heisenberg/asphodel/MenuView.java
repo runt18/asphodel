@@ -10,6 +10,7 @@ public class MenuView extends android.opengl.GLSurfaceView {
     public MenuView(Context context) {
         super(context);
         
+        setEGLContextClientVersion(2);
         setRenderer(new MenuRenderer());
     }
     
