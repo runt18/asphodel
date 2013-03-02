@@ -11,11 +11,12 @@ public class Triangle {
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
 
-    private final float triCoords[] = {
+    private static final float coords[] = {
         0, 0, 0, 0, 1, 0, 1, 0, 0,
         0, 1, 0, 1, 0, 0, 1, 1, 1
     };
 
+    // TODO: load from external files
     private final String vertexShaderCode =
         "attribute vec4 vPosition;" +
         "attribute vec4 vColor;" +
@@ -50,21 +51,18 @@ public class Triangle {
     static final int NUM_FLOATS = FLOATS_PER_TRIANGLE * NUM_TRIANGLES;
     static final int NUM_COLOR_FLOATS = FLOATS_PER_COLOR * NUM_VERTICES;
 
-    static float triangleCoords[] = new float[NUM_FLOATS];
+    static float vertices[] = new float[NUM_FLOATS];
     static float colors[] = new float[NUM_COLOR_FLOATS];
-
-    // Set color with red, green, blue and alpha (opacity) values
-//    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
 
     public Triangle() {
         Random r = new Random();
         for(int i = 0; i < NUM_QUADS; i++){
             for(int j = 0; j < FLOATS_PER_QUAD; j++){
-                float coord = triCoords[j];
+                float coord = coords[j];
                 if(j % 3 == 0){
                     coord += i * 0.1f;
                 }
-                triangleCoords[i * FLOATS_PER_QUAD + j] = coord;
+                vertices[i * FLOATS_PER_QUAD + j] = coord;
             }
         }
 
@@ -77,29 +75,8 @@ public class Triangle {
             }
         }
 
-        // initialize vertex byte buffer for shape coordinates
-        ByteBuffer bb = ByteBuffer.allocateDirect(NUM_FLOATS * BYTES_PER_FLOAT);
-        // use the device hardware's native byte order
-        bb.order(ByteOrder.nativeOrder());
-
-        // create a floating point buffer from the ByteBuffer
-        vertexBuffer = bb.asFloatBuffer();
-        // add the coordinates to the FloatBuffer
-        vertexBuffer.put(triangleCoords);
-        // set the buffer to read the first coordinate
-        vertexBuffer.position(0);
-
-        // initialize vertex byte buffer for shape coordinates
-        ByteBuffer bb2 = ByteBuffer.allocateDirect(NUM_COLOR_FLOATS * BYTES_PER_FLOAT);
-        // use the device hardware's native byte order
-        bb2.order(ByteOrder.nativeOrder());
-
-        // create a floating point buffer from the ByteBuffer
-        colorBuffer = bb2.asFloatBuffer();
-        // add the coordinates to the FloatBuffer
-        colorBuffer.put(colors);
-        // set the buffer to read the first coordinate
-        colorBuffer.position(0);
+        vertexBuffer = allocateBuffer(vertices, NUM_FLOATS * BYTES_PER_FLOAT);
+        colorBuffer = allocateBuffer(colors, NUM_COLOR_FLOATS * BYTES_PER_FLOAT);
 
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
@@ -110,7 +87,23 @@ public class Triangle {
         GLES20.glLinkProgram(program);                  // creates OpenGL ES program executables
     }
 
-    public static int loadShader(int type, String shaderCode){
+    private FloatBuffer allocateBuffer(float[] rawData, int size){
+        // initialize vertex byte buffer for shape coordinates
+        ByteBuffer bb2 = ByteBuffer.allocateDirect(size);
+        // use the device hardware's native byte order
+        bb2.order(ByteOrder.nativeOrder());
+
+        // create a floating point buffer from the ByteBuffer
+        FloatBuffer buffer = bb2.asFloatBuffer();
+        // add the coordinates to the FloatBuffer
+        buffer.put(rawData);
+        // set the buffer to read the first coordinate
+        buffer.position(0);
+
+        return buffer;
+    }
+
+    private int loadShader(int type, String shaderCode){
         // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
         // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
         int shader = GLES20.glCreateShader(type);
@@ -126,23 +119,23 @@ public class Triangle {
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(program);
 
-        // get handle to vertex shader's vPosition member
-        int positionHandle = GLES20.glGetAttribLocation(program, "vPosition");
+        // Get handles for shader data
+        int vertexHandle = GLES20.glGetAttribLocation(program, "vPosition");
         int colorHandle = GLES20.glGetAttribLocation(program, "vColor");
 
-        // Enable a handle to the triangle vertices
-        GLES20.glEnableVertexAttribArray(positionHandle);
+        // Enable data arrays
+        GLES20.glEnableVertexAttribArray(vertexHandle);
         GLES20.glEnableVertexAttribArray(colorHandle);
 
-        // Prepare the triangle coordinate data
-        GLES20.glVertexAttribPointer(positionHandle, FLOATS_PER_VERTEX, GLES20.GL_FLOAT, false, 0, vertexBuffer);
+        // Prepare the triangle data
+        GLES20.glVertexAttribPointer(vertexHandle, FLOATS_PER_VERTEX, GLES20.GL_FLOAT, false, 0, vertexBuffer);
         GLES20.glVertexAttribPointer(colorHandle, FLOATS_PER_COLOR, GLES20.GL_FLOAT, false, 0, colorBuffer);
 
-        // Draw the triangle
+        // Draw the triangles
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, NUM_VERTICES);
 
-        // Disable vertex array
-        GLES20.glDisableVertexAttribArray(positionHandle);
+        // Disable data arrays
+        GLES20.glDisableVertexAttribArray(vertexHandle);
         GLES20.glDisableVertexAttribArray(colorHandle);
     }
 }
