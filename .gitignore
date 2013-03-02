@@ -1,3 +1,13 @@
 .idea
 *.iml
 Project/bin/
+
+# NBAndroid stuff
+/Project/nbandroid/
+Project/ant.properties
+Project/build.properties
+Project/build.xml
+Project/default.properties
+Project/gen/R.java.d
+Project/local.properties
+Project/proguard-project.txt
