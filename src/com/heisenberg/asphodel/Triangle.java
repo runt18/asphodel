@@ -17,21 +17,8 @@ public class Triangle {
     };
 
     // TODO: load from external files
-    private final String vertexShaderCode =
-        "attribute vec4 vPosition;" +
-        "attribute vec4 vColor;" +
-        "varying vec4 v_Color;" +
-        "void main() {" +
-        "  gl_Position = vPosition;" +
-        "  v_Color = vColor;" +
-        "}";
-
-    private final String fragmentShaderCode =
-        "precision mediump float;" +
-        "varying vec4 v_Color;" +
-        "void main() {" +
-        "  gl_FragColor = v_Color;" +
-        "}";
+    private final String vertexShaderCode = GLView.getShader(R.raw.vertexshadercode);
+    private final String fragmentShaderCode = GLView.getShader(R.raw.fragmentshadercode);
 
     int program;
 
