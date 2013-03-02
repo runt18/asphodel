@@ -13,7 +13,7 @@ public class GLRenderer implements Renderer {
     public void onDrawFrame(GL10 gl) {
         // Blank background
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-//        tri.draw();
+        tri.draw();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class GLRenderer implements Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig arg1) {
         // General rendering settings
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-//        tri = new Triangle();
+        tri = new Triangle();
     }
 
 }
