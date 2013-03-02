@@ -6,6 +6,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class MyActivity extends Activity {
+    private static MyActivity curActivity;
+    
     /**
      * Our OpenGL View object
      */
@@ -23,5 +25,12 @@ public class MyActivity extends Activity {
         
         mView = new GLView(this);
         setContentView(mView);
+        
+        // Store
+        curActivity = this;
+    }
+    
+    public static MyActivity getInstance() {
+        return curActivity;
     }
 }

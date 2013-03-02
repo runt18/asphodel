@@ -4,6 +4,8 @@ out
 gen
 .project
 *.properties
+*.db
+*.DS_Store
 bin/
 
 # NBAndroid stuff
