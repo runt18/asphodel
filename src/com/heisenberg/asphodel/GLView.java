@@ -8,6 +8,8 @@ public class GLView extends android.opengl.GLSurfaceView {
         super(context);
         
         // Use our custom renderer
+
+        setEGLContextClientVersion(2);
         setRenderer(new GLRenderer());
     }
     
