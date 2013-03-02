@@ -1,7 +1,10 @@
 package com.heisenberg.asphodel;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -19,7 +22,11 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        PowerManager pm = (PowerManager)this.getSystemService(
+                Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MyActivity");
+        wl.acquire();        
+//        vb.cancel();
         // Store
         curActivity = this;
         
