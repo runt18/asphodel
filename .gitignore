@@ -2,7 +2,9 @@
 *.iml
 out
 gen
-
+.project
+*.properties
+bin/
 
 # NBAndroid stuff
 /Project/nbandroid/
