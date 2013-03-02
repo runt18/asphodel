@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import com.heisenberg.asphodel.Vector2;
 
 public class MyActivity extends Activity {
     private static MyActivity curActivity;
@@ -34,5 +35,12 @@ public class MyActivity extends Activity {
     
     public static MyActivity getInstance() {
         return curActivity;
+    }
+
+    public static Vector2 getScreenSize(){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return new Vector2(size.x, size.y);
     }
 }

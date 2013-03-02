@@ -10,11 +10,13 @@ public class GLView extends GLSurfaceView {
     private float prevY = 0;
     private GLRenderer renderer;
 
+
     public GLView(Context context) {
         super(context);
         
         // Use our custom renderer
         setEGLContextClientVersion(2);
+//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         renderer = new GLRenderer();
         setRenderer(renderer);
     }
