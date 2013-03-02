@@ -48,9 +48,14 @@ public class Triangle {
     public Triangle() {
         Random r = new Random();
         int l = 0;
+
+        // Iterate through each row in the terrain grid
         for(int i = 0; i < WORLD_SIZE; i++){
+            // Iterate through each cell in the row
             for(int j = 0; j < WORLD_SIZE; j++){
+                // Iterate through each float in the cell
                 for(int k = 0; k < FLOATS_PER_QUAD; k++){
+                    // Offset the vertices in the cell by the cell's position in the grid
                     float coord = coords[k];
                     if(k % 3 == 0){
                         coord += i;
@@ -58,6 +63,8 @@ public class Triangle {
                     else if(k % 3 == 1){
                         coord += j;
                     }
+
+                    // Add the value to the final array of vertices
                     vertices[l] = coord;
                     l++;
                 }
@@ -65,9 +72,13 @@ public class Triangle {
         }
 
         int k = 0;
+        // Iterate through each cell in the terrain grid
         for(int i = 0; i < NUM_QUADS; i++){
+            // Generate a random color for the quad
             float[] color = new float[]{r.nextFloat(), r.nextFloat(), r.nextFloat()};
+            // Iterate through each vertex in the quad
             for(int j = 0; j < VERTICES_PER_QUAD; j++){
+                // Add that color to the final array
                 colors[k] = color[0];
                 colors[k + 1] = color[1];
                 colors[k + 2] = color[2];
@@ -76,8 +87,11 @@ public class Triangle {
             }
         }
 
+        // Allocate FloatBuffers to send the float arrays to be rendered
         vertexBuffer = allocateBuffer(vertices, NUM_FLOATS);
         colorBuffer = allocateBuffer(colors, NUM_COLOR_FLOATS);
+
+        // Declare the ModelView Matrix
         modelViewMatrix = new float[]{
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -87,13 +101,17 @@ public class Triangle {
 
 //        Matrix.setRotateM(modelViewMatrix, 0, 3.14f / 4, 1, 0, 0);
 
+        // Load the vertex and fragment shaders
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
-        program = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(program, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(program, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(program);                  // creates OpenGL ES program executables
+        // Create an empty OpenGL ES Program
+        program = GLES20.glCreateProgram();
+        // Add the shaders to the program
+        GLES20.glAttachShader(program, vertexShader);
+        GLES20.glAttachShader(program, fragmentShader);
+        // Create the OpenGL ES program executables
+        GLES20.glLinkProgram(program);
     }
 
     private FloatBuffer allocateBuffer(float[] rawData, int size){
