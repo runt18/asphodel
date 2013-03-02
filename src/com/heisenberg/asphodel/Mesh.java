@@ -17,6 +17,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.res.Resources.NotFoundException;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Xml;
 
 /**
@@ -70,19 +71,19 @@ public class Mesh {
     // Rendering code
     public void draw(DrawHelper mDh) {
         // Set the color
-        GLES20.glUniform4f(mDh.colorHandle, 0.5f, 0.5f, 0.5f, 1.0f);
+        GLES20.glUniform4f(mDh.colorHandle, 1.0f, 0.5f, 0.5f, 1.0f);
         
         // Send in vertex positions
         vb.position(0);
         GLES20.glVertexAttribPointer(mDh.vertexHandle, 3, GLES20.GL_FLOAT, false, 0, vb);
 
         // Send in normals
-        //nb.position(0);
-        //GLES20.glVertexAttribPointer(mDh.normalHandle, 3, GLES20.GL_FLOAT, false, 0, nb);
+        nb.position(0);
+        GLES20.glVertexAttribPointer(mDh.normalHandle, 3, GLES20.GL_FLOAT, false, 0, nb);
         
-        //ib.position(0);
-        //GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, ib);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        ib.position(0);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, ib);
+        //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }
     
     // File loader
@@ -138,9 +139,7 @@ public class Mesh {
                     for (int i = 0; i < values.length; i++) {
                         ge.fdata[i] = Float.parseFloat(values[i]);
                     }
-                    
-                    System.out.println("Read: "+ge.fdata.length+" floats");
-                    
+                                        
                     ge.type = "float";
                     
                     geom.add(ge);
@@ -212,7 +211,7 @@ public class Mesh {
         }
         
         // Success!
-        System.out.println("Done with DAE!");
+        System.out.println("DAE successfully loaded");
     }
     
     private void xmlSkipTo(XmlPullParser parser, String name) throws XmlPullParserException, IOException {

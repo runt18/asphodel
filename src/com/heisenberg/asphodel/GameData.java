@@ -17,7 +17,7 @@ public class GameData {
             actors = new ArrayList<Actor>();
             
             // Try making an actor
-            Actor a = new Actor(R.raw.test_mesh);
+            Actor a = new Actor(R.raw.message);
             
             initialised = true;
         }

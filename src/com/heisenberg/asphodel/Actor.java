@@ -1,5 +1,6 @@
 package com.heisenberg.asphodel;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 /**
@@ -25,6 +26,9 @@ public class Actor {
         mMesh = new Mesh(meshID);
         id = "Actor" + meshID;
         
+        matRotate = new float[16];
+        Matrix.setIdentityM(matRotate, 0);
+        
         GameData.addActor(this);
     }
     
@@ -44,6 +48,13 @@ public class Actor {
     }
     
     public void draw(DrawHelper mDh) {
+        // Set the wvp matrix
+        float[] wvp = new float[16];
+        Matrix.rotateM(matRotate, 0, 5, 0, 1, 0);
+        Matrix.multiplyMM(wvp, 0, mDh.matVP, 0, matRotate, 0);
+        
+        GLES20.glUniformMatrix4fv(mDh.matrixHandle, 1, false, wvp, 0);
+        
         mMesh.draw(mDh);
     }
 

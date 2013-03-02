@@ -83,7 +83,8 @@ public class GLRenderer implements Renderer {
             };*/
         
         // Set VP matrix
-        GLES20.glUniformMatrix4fv(mDh.matrixHandle, 1, false, matVP, 0);
+        //GLES20.glUniformMatrix4fv(mDh.matrixHandle, 1, false, matVP, 0);
+        mDh.matVP = matVP;
         
         // Actor draws its own triangles
         actor.draw(mDh);
