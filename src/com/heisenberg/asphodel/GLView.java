@@ -1,5 +1,9 @@
 package com.heisenberg.asphodel;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -9,10 +13,9 @@ public class GLView extends GLSurfaceView {
     private float prevX = 0;
     private float prevY = 0;
     private GLRenderer renderer;
-
+	
     public GLView(Context context) {
         super(context);
-        
         // Use our custom renderer
         setEGLContextClientVersion(2);
         renderer = new GLRenderer();
@@ -60,5 +63,25 @@ public class GLView extends GLSurfaceView {
         prevX = x;
         prevY = y;
         return true;
+    }
+    
+    public static String getShader(int id) {
+    	InputStream res = MyActivity.getInstance().getResources().openRawResource(id);
+    	BufferedReader br = new BufferedReader(new InputStreamReader(res));
+    	StringBuilder sb = new StringBuilder();
+    	try{
+    		while(br.ready()) {
+    			sb.append(br.readLine());
+    		}
+    	} catch(IOException e) {
+    		Log.e("Asphodel","Failed to load shader with id:"+id);
+    	} finally {
+    			try {
+					br.close();
+				} catch (IOException e) {
+					Log.e("Asphodel","Failed to close shader with id:"+id);
+				}
+    	}
+    	return sb.toString();
     }
 }

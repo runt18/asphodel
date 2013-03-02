@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Random;
-
 import android.opengl.GLES20;
 import static com.heisenberg.asphodel.RenderConstants.*;
 import android.opengl.Matrix;
@@ -22,23 +21,8 @@ public class Triangle {
         0, 1, 0, 1, 0, 0, 1, 1, 1
     };
 
-    // TODO: load from external files
-    private final String vertexShaderCode =
-        "attribute vec4 vPosition;" +
-        "attribute vec4 vColor;" +
-        "varying vec4 v_Color;" +
-        "uniform mat4 mvp_matrix;" +
-        "void main() {" +
-        "  gl_Position = mvp_matrix * vPosition;" +
-        "  v_Color = vColor;" +
-        "}";
-
-    private final String fragmentShaderCode =
-        "precision mediump float;" +
-        "varying vec4 v_Color;" +
-        "void main() {" +
-        "  gl_FragColor = v_Color;" +
-        "}";
+    private final String vertexShaderCode = GLView.getShader(R.raw.vertexshadercode);
+    private final String fragmentShaderCode = GLView.getShader(R.raw.fragmentshadercode);
 
     int program;
 
