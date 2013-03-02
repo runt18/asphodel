@@ -20,6 +20,9 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Store
+        curActivity = this;
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -28,9 +31,6 @@ public class MyActivity extends Activity {
         
         mView = new GLView(this);
         setContentView(mView);
-        
-        // Store
-        curActivity = this;
     }
     
     public static MyActivity getInstance() {

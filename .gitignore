@@ -7,13 +7,14 @@ gen
 *.db
 *.DS_Store
 bin/
+*.skb
 
 # NBAndroid stuff
-/Project/nbandroid/
-Project/ant.properties
-Project/build.properties
-Project/build.xml
-Project/default.properties
-Project/gen/R.java.d
-Project/local.properties
-Project/proguard-project.txt
+nbandroid/
+ant.properties
+build.properties
+build.xml
+default.properties
+gen/R.java.d
+local.properties
+proguard-project.txt
