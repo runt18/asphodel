@@ -10,6 +10,7 @@ import android.opengl.GLES20;
 public class Triangle {
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
+    public float[] modelViewMatrix;
 
     private static final float coords[] = {
         0, 0, 0, 0, 1, 0, 1, 0, 0,
@@ -21,8 +22,9 @@ public class Triangle {
         "attribute vec4 vPosition;" +
         "attribute vec4 vColor;" +
         "varying vec4 v_Color;" +
+        "uniform mat4 mvp_matrix;" +
         "void main() {" +
-        "  gl_Position = vPosition;" +
+        "  gl_Position = mvp_matrix * vPosition;" +
         "  v_Color = vColor;" +
         "}";
 
@@ -75,8 +77,14 @@ public class Triangle {
             }
         }
 
-        vertexBuffer = allocateBuffer(vertices, NUM_FLOATS * BYTES_PER_FLOAT);
-        colorBuffer = allocateBuffer(colors, NUM_COLOR_FLOATS * BYTES_PER_FLOAT);
+        vertexBuffer = allocateBuffer(vertices, NUM_FLOATS);
+        colorBuffer = allocateBuffer(colors, NUM_COLOR_FLOATS);
+        modelViewMatrix = new float[]{
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        };
 
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
@@ -89,7 +97,7 @@ public class Triangle {
 
     private FloatBuffer allocateBuffer(float[] rawData, int size){
         // initialize vertex byte buffer for shape coordinates
-        ByteBuffer bb2 = ByteBuffer.allocateDirect(size);
+        ByteBuffer bb2 = ByteBuffer.allocateDirect(size * BYTES_PER_FLOAT);
         // use the device hardware's native byte order
         bb2.order(ByteOrder.nativeOrder());
 
@@ -122,14 +130,18 @@ public class Triangle {
         // Get handles for shader data
         int vertexHandle = GLES20.glGetAttribLocation(program, "vPosition");
         int colorHandle = GLES20.glGetAttribLocation(program, "vColor");
+        int matrixHandle = GLES20.glGetUniformLocation(program, "mvp_matrix");
 
         // Enable data arrays
         GLES20.glEnableVertexAttribArray(vertexHandle);
         GLES20.glEnableVertexAttribArray(colorHandle);
+        GLES20.glEnableVertexAttribArray(matrixHandle);
 
         // Prepare the triangle data
         GLES20.glVertexAttribPointer(vertexHandle, FLOATS_PER_VERTEX, GLES20.GL_FLOAT, false, 0, vertexBuffer);
         GLES20.glVertexAttribPointer(colorHandle, FLOATS_PER_COLOR, GLES20.GL_FLOAT, false, 0, colorBuffer);
+//        GLES20.glVertexAttribPointer(matrixHandle, 16, GLES20.GL_FLOAT, false, 0, modelViewMatrix);
+        GLES20.glUniformMatrix4fv(matrixHandle, 1, false, modelViewMatrix, 0);
 
         // Draw the triangles
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, NUM_VERTICES);
@@ -137,5 +149,6 @@ public class Triangle {
         // Disable data arrays
         GLES20.glDisableVertexAttribArray(vertexHandle);
         GLES20.glDisableVertexAttribArray(colorHandle);
+        GLES20.glDisableVertexAttribArray(matrixHandle);
     }
 }
