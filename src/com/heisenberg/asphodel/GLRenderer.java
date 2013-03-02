@@ -57,12 +57,12 @@ public class GLRenderer implements Renderer {
         Actor actor = GameData.getActor(0);
         
         // Setup projection & view
-        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 100.0f);
+        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 1000.0f);
         /*Matrix.setLookAtM(  matView, 0,
                             0.0f, 0.0f, -5.0f,
                             0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f);*/
-        Matrix.setLookAtM(matView, 0, 0, 0, -60, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(matView, 0, 0, 50, -120, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         float[] matVP = new float[16];
         Matrix.multiplyMM(matVP, 0, matProj, 0, matView, 0);
         
@@ -83,7 +83,6 @@ public class GLRenderer implements Renderer {
             };*/
         
         // Set VP matrix
-        //GLES20.glUniformMatrix4fv(mDh.matrixHandle, 1, false, matVP, 0);
         mDh.matVP = matVP;
         
         // Actor draws its own triangles

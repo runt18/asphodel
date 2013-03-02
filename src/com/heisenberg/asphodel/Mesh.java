@@ -35,21 +35,15 @@ public class Mesh {
         public String type;
     }
     
-    // Raw data
-    //private float verts[];
-    //private float normals[];
-    private short indices[];
-    
-    // Buffers
-    private FloatBuffer vb;
-    private FloatBuffer nb;
-    private ShortBuffer ib;
+    // Sub meshes
+    ArrayList<SubMesh> subMeshes;
     
     // Corresponding Resource ID
     private int meshID;
     
     // Constructor calls file load
     public Mesh(int resID) {
+        subMeshes = new ArrayList<SubMesh>();
         meshID = resID;
         
         if (resID != -3) {
@@ -58,32 +52,26 @@ public class Mesh {
         }
         else {
             System.out.println("Triangle time");
+            
+            SubMesh sm = new SubMesh();
+            subMeshes.add(sm);
             float[] coords = { 0, -1, 0, 1, 1, 0, -1, 1, 0 };
             ByteBuffer bb = ByteBuffer.allocateDirect(4* coords.length);
             bb.order(ByteOrder.nativeOrder());
-            vb = bb.asFloatBuffer();
-            vb.put(coords);
+            FloatBuffer fb = bb.asFloatBuffer();
+            fb.put(coords);
+            sm.setVertexBuffer(fb);
         }
         
         GameData.addMesh(this);
     }
     
     // Rendering code
-    public void draw(DrawHelper mDh) {
-        // Set the color
-        GLES20.glUniform4f(mDh.colorHandle, 1.0f, 0.5f, 0.5f, 1.0f);
-        
-        // Send in vertex positions
-        vb.position(0);
-        GLES20.glVertexAttribPointer(mDh.vertexHandle, 3, GLES20.GL_FLOAT, false, 0, vb);
-
-        // Send in normals
-        nb.position(0);
-        GLES20.glVertexAttribPointer(mDh.normalHandle, 3, GLES20.GL_FLOAT, false, 0, nb);
-        
-        ib.position(0);
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES20.GL_UNSIGNED_SHORT, ib);
-        //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+    public void draw(DrawHelper dh) {
+        // Just loop the submeshes for now
+        for (SubMesh sm : subMeshes) {
+            sm.draw(dh);
+        }
     }
     
     // File loader
@@ -111,97 +99,121 @@ public class Mesh {
             // Needs a valid DAE file
             parser.require(XmlPullParser.START_TAG, null, "COLLADA");
             
-            // Go straight to geometry
-            xmlSkipTo(parser, "mesh");
-            
-            String posid, normid;
-            posid = null;
-            normid = null;
-            
+            // Loop to create submeshes
             while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                if (parser.getEventType() != XmlPullParser.START_TAG) {
-                    continue;
+                // Go straight to geometry
+                if (!xmlSkipTo(parser, "mesh")) {
+                    // Couldn't find it
+                    break;
+                }
+                SubMesh curSubMesh = new SubMesh();
+                subMeshes.add(curSubMesh);
+                
+                String posid, normid;
+                posid = null;
+                normid = null;
+                
+                // Loop SHOULD terminate before EOF... but just in case
+                while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                    // Exit loop at end of mesh decl
+                    if (parser.getEventType() == XmlPullParser.END_TAG) {
+                        String name = parser.getName();
+                        if (name.equals("mesh")) {
+                            break;
+                        }
+                    }
+                    // Otherwise skip eveything but the start tags
+                    if (parser.getEventType() != XmlPullParser.START_TAG) {
+                        continue;
+                    }
+                    
+                    String name = parser.getName();
+                    // Source: Floating-point data
+                    if (name.equals("source")) {
+                        GeomEntry ge = new GeomEntry();
+                        ge.id = parser.getAttributeValue(0);
+                        
+                        // Skip to the data
+                        xmlSkipTo(parser, "float_array");
+                        parser.next();
+                        String raw = parser.getText();
+                        String[] values = raw.split(" ");
+                        ge.fdata = new float[values.length];
+                        
+                        for (int i = 0; i < values.length; i++) {
+                            ge.fdata[i] = Float.parseFloat(values[i]);
+                        }
+                                            
+                        ge.type = "float";
+                        
+                        geom.add(ge);
+                    }
+                    // Triangles: Index buffer
+                    else if (name.equals("triangles")) {
+                        GeomEntry ge = new GeomEntry();
+                        
+                        // Skip to index buffer description
+                        xmlSkipTo(parser, "input");
+                        ge.id = parser.getAttributeValue(2);
+                        
+                        // Skip to index buffer content
+                        xmlSkipTo(parser, "p");
+                        parser.next();
+                        
+                        // Retrieve and parse text as shorts
+                        String raw = parser.getText();
+                        String[] values = raw.split(" ");
+                        ge.sdata = new short[values.length];
+                        
+                        for (int i = 0; i < values.length; i++) {
+                            ge.sdata[i] = Short.parseShort(values[i]);
+                        }
+                        
+                        // Store count & type
+                        curSubMesh.setIndexCount(ge.sdata.length);
+                        ge.type = "short";
+                        
+                        geom.add(ge);
+                    }
+                    // Vertices: Determines usage
+                    else if (name.equals("vertices")) {
+                        xmlSkipTo(parser, "input");
+                        if (parser.getAttributeValue(0).equals("POSITION")) {
+                            posid = parser.getAttributeValue(1).substring(1);
+                        }
+                        xmlSkipTo(parser, "input");
+                        if (parser.getAttributeValue(0).equals("NORMAL")) {
+                            normid = parser.getAttributeValue(1).substring(1);
+                        }
+                    }
                 }
                 
-                String name = parser.getName();
-                // Source: Floating-point data
-                if (name.equals("source")) {
-                    GeomEntry ge = new GeomEntry();
-                    ge.id = parser.getAttributeValue(0);
-                    
-                    // Skip to the data
-                    xmlSkipTo(parser, "float_array");
-                    parser.next();
-                    String raw = parser.getText();
-                    String[] values = raw.split(" ");
-                    ge.fdata = new float[values.length];
-                    
-                    for (int i = 0; i < values.length; i++) {
-                        ge.fdata[i] = Float.parseFloat(values[i]);
+                // Use the data (store in current sub-mesh)
+                for (GeomEntry ge : geom) {
+                    if (ge.type.equals("float")) {
+                        // Get as a buffer
+                        ByteBuffer bb = ByteBuffer.allocateDirect(ge.fdata.length * 4);
+                        bb.order(ByteOrder.nativeOrder());
+                        FloatBuffer fb = bb.asFloatBuffer();
+                        fb.put(ge.fdata);
+                        
+                        if (posid.equals(ge.id)) {
+                            // Save vertex buffer
+                            curSubMesh.setVertexBuffer(fb);
+                        }
+                        else if (normid.equals(ge.id)) {
+                            // Save normal buffer
+                            curSubMesh.setNormalBuffer(fb);
+                        }
                     }
-                                        
-                    ge.type = "float";
-                    
-                    geom.add(ge);
-                }
-                // Triangles: Index buffer
-                else if (name.equals("triangles")) {
-                    GeomEntry ge = new GeomEntry();
-                    xmlSkipTo(parser, "input");
-                    ge.id = parser.getAttributeValue(2);
-                    xmlSkipTo(parser, "p");
-                    parser.next();
-                    String raw = parser.getText();
-                    String[] values = raw.split(" ");
-                    ge.sdata = new short[values.length];
-                    
-                    for (int i = 0; i < values.length; i++) {
-                        ge.sdata[i] = Short.parseShort(values[i]);
+                    else if (ge.type.equals("short")) {
+                        ByteBuffer bb = ByteBuffer.allocateDirect(ge.sdata.length * 2);
+                        bb.order(ByteOrder.nativeOrder());
+                        ShortBuffer sb = bb.asShortBuffer();
+                        sb.put(ge.sdata);
+                        
+                        curSubMesh.setIndexBuffer(sb);
                     }
-                    
-                    indices = ge.sdata;
-                    ge.type = "short";
-                    
-                    geom.add(ge);
-                }
-                // Vertices: Determines usage
-                else if (name.equals("vertices")) {
-                    xmlSkipTo(parser, "input");
-                    if (parser.getAttributeValue(0).equals("POSITION")) {
-                        posid = parser.getAttributeValue(1).substring(1);
-                    }
-                    xmlSkipTo(parser, "input");
-                    if (parser.getAttributeValue(0).equals("NORMAL")) {
-                        normid = parser.getAttributeValue(1).substring(1);
-                    }
-                }
-            }
-            
-            // Use the data
-            for (GeomEntry ge : geom) {
-                if (ge.type.equals("float")) {
-                    // Get as a buffer
-                    ByteBuffer bb = ByteBuffer.allocateDirect(ge.fdata.length * 4);
-                    bb.order(ByteOrder.nativeOrder());
-                    FloatBuffer fb = bb.asFloatBuffer();
-                    fb.put(ge.fdata);
-                    
-                    if (posid.equals(ge.id)) {
-                        // Save vertex buffer
-                        vb = fb;
-                    }
-                    else if (normid.equals(ge.id)) {
-                        // Save normal buffer
-                        nb = fb;
-                    }
-                }
-                else if (ge.type.equals("short")) {
-                    ByteBuffer bb = ByteBuffer.allocateDirect(ge.sdata.length * 2);
-                    bb.order(ByteOrder.nativeOrder());
-                    ShortBuffer sb = bb.asShortBuffer();
-                    sb.put(ge.sdata);
-                    
-                    ib = sb;
                 }
             }
         }
@@ -214,7 +226,7 @@ public class Mesh {
         System.out.println("DAE successfully loaded");
     }
     
-    private void xmlSkipTo(XmlPullParser parser, String name) throws XmlPullParserException, IOException {
+    private boolean xmlSkipTo(XmlPullParser parser, String name) throws XmlPullParserException, IOException {
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -223,7 +235,24 @@ public class Mesh {
             String n = parser.getName();
             
             if (n.equals(name)) {
-                System.out.println("Found "+name);
+                //System.out.println("Found "+name);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private void xmlSkipToEnd(XmlPullParser parser, String name) throws XmlPullParserException, IOException {
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+            if (parser.getEventType() != XmlPullParser.END_TAG) {
+                continue;
+            }
+            
+            String n = parser.getName();
+            
+            if (n.equals(name)) {
+                System.out.println("End of "+name);
                 return;
             }
         }

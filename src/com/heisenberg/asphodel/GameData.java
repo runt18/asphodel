@@ -17,7 +17,7 @@ public class GameData {
             actors = new ArrayList<Actor>();
             
             // Try making an actor
-            Actor a = new Actor(R.raw.message);
+            Actor a = new Actor(R.raw.shapes);
             
             initialised = true;
         }
