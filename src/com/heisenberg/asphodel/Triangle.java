@@ -47,17 +47,19 @@ public class Triangle {
 
     public Triangle() {
         Random r = new Random();
+        int l = 0;
         for(int i = 0; i < WORLD_SIZE; i++){
             for(int j = 0; j < WORLD_SIZE; j++){
                 for(int k = 0; k < FLOATS_PER_QUAD; k++){
                     float coord = coords[k];
-                    if(k % 3 == 1){
+                    if(k % 3 == 0){
                         coord += i;
                     }
-//                    else if(k % 3 == 0){
-//                        coord += j;
-//                    }
-                    vertices[i * FLOATS_PER_QUAD * WORLD_SIZE + j + FLOATS_PER_QUAD + k] = coord;
+                    else if(k % 3 == 1){
+                        coord += j;
+                    }
+                    vertices[l] = coord;
+                    l++;
                 }
             }
         }
