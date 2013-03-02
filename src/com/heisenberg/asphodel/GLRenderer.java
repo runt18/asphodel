@@ -4,7 +4,6 @@ import android.opengl.GLES20;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import android.opengl.GLSurfaceView.Renderer;
-//import com.heisenberg.asphodel.Triangle;
 
 public class GLRenderer implements Renderer {
     private Triangle tri;

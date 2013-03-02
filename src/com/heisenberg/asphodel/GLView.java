@@ -37,8 +37,10 @@ public class GLView extends GLSurfaceView {
 
 //                Log.i(" POSITION", "" + dx);
 
-                renderer.ox += dx * 0.01f;
-                renderer.oy += -dy * 0.01f;
+                if(x >= 400){
+                    renderer.ox += dx * 0.01f;
+                    renderer.oy += -dy * 0.01f;
+                }
 
 //                // reverse direction of rotation above the mid-line
 //                if (y > getHeight() / 2) {

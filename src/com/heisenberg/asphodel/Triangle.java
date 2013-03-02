@@ -6,10 +6,15 @@ import java.nio.FloatBuffer;
 import java.util.Random;
 
 import android.opengl.GLES20;
+import static com.heisenberg.asphodel.RenderConstants.*;
+import android.opengl.Matrix;
 
 public class Triangle {
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
+
+    public float[] rotationMatrix;
+    public float[] translationMatrix;
     public float[] modelViewMatrix;
 
     private static final float coords[] = {
@@ -37,43 +42,35 @@ public class Triangle {
 
     int program;
 
-    // number of coordinates per vertex in this array
-    static final int BYTES_PER_FLOAT = 4;
-    static final int FLOATS_PER_VERTEX = 3;
-    static final int FLOATS_PER_COLOR = 4;
-    static final int VERTICES_PER_TRIANGLE = 3;
-    static final int TRIANGLES_PER_QUAD = 2;
-    static final int NUM_QUADS = 10;
-
-    static final int NUM_TRIANGLES = TRIANGLES_PER_QUAD * NUM_QUADS;
-    static final int FLOATS_PER_TRIANGLE = FLOATS_PER_VERTEX * VERTICES_PER_TRIANGLE;
-    static final int FLOATS_PER_QUAD = FLOATS_PER_TRIANGLE * TRIANGLES_PER_QUAD;
-    static final int NUM_VERTICES = NUM_TRIANGLES * VERTICES_PER_TRIANGLE;
-
-    static final int NUM_FLOATS = FLOATS_PER_TRIANGLE * NUM_TRIANGLES;
-    static final int NUM_COLOR_FLOATS = FLOATS_PER_COLOR * NUM_VERTICES;
-
     static float vertices[] = new float[NUM_FLOATS];
     static float colors[] = new float[NUM_COLOR_FLOATS];
 
     public Triangle() {
         Random r = new Random();
-        for(int i = 0; i < NUM_QUADS; i++){
-            for(int j = 0; j < FLOATS_PER_QUAD; j++){
-                float coord = coords[j];
-                if(j % 3 == 0){
-                    coord += i * 0.1f;
+        for(int i = 0; i < WORLD_SIZE; i++){
+            for(int j = 0; j < WORLD_SIZE; j++){
+                for(int k = 0; k < FLOATS_PER_QUAD; k++){
+                    float coord = coords[k];
+                    if(k % 3 == 1){
+                        coord += i;
+                    }
+//                    else if(k % 3 == 0){
+//                        coord += j;
+//                    }
+                    vertices[i * FLOATS_PER_QUAD * WORLD_SIZE + j + FLOATS_PER_QUAD + k] = coord;
                 }
-                vertices[i * FLOATS_PER_QUAD + j] = coord;
             }
         }
 
-        for(int i = 0; i < NUM_COLOR_FLOATS; i++){
-            if(i % 4 == 3){
-                colors[i] = 1.0f;
-            }
-            else {
-                colors[i] = r.nextFloat();
+        int k = 0;
+        for(int i = 0; i < NUM_QUADS; i++){
+            float[] color = new float[]{r.nextFloat(), r.nextFloat(), r.nextFloat()};
+            for(int j = 0; j < VERTICES_PER_QUAD; j++){
+                colors[k] = color[0];
+                colors[k + 1] = color[1];
+                colors[k + 2] = color[2];
+                colors[k + 3] = 1.0f;
+                k += 4;
             }
         }
 
@@ -85,6 +82,8 @@ public class Triangle {
             0, 0, 1, 0,
             0, 0, 0, 1
         };
+
+//        Matrix.setRotateM(modelViewMatrix, 0, 3.14f / 4, 1, 0, 0);
 
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
@@ -127,6 +126,8 @@ public class Triangle {
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(program);
 
+//        Matrix.multiplyMM(modelViewMatrix, 0, translationMatrix, 0, modelViewMatrix, 0);
+
         // Get handles for shader data
         int vertexHandle = GLES20.glGetAttribLocation(program, "vPosition");
         int colorHandle = GLES20.glGetAttribLocation(program, "vColor");
@@ -140,7 +141,6 @@ public class Triangle {
         // Prepare the triangle data
         GLES20.glVertexAttribPointer(vertexHandle, FLOATS_PER_VERTEX, GLES20.GL_FLOAT, false, 0, vertexBuffer);
         GLES20.glVertexAttribPointer(colorHandle, FLOATS_PER_COLOR, GLES20.GL_FLOAT, false, 0, colorBuffer);
-//        GLES20.glVertexAttribPointer(matrixHandle, 16, GLES20.GL_FLOAT, false, 0, modelViewMatrix);
         GLES20.glUniformMatrix4fv(matrixHandle, 1, false, modelViewMatrix, 0);
 
         // Draw the triangles
