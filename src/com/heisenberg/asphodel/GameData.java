@@ -54,10 +54,11 @@ public class GameData {
             z = r.nextFloat() - 0.5f;
             
             rock.translate(new float[] {x*600, y*20, z*600});
+            rock.scale(r.nextFloat() + 0.2f);
         }
         
         // Grass
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 60; i++) {
             Actor grass = new Actor(R.raw.grass);
             
             grass.color = new float[] {0.4f,1.0f,0.4f,1.0f};
@@ -69,6 +70,7 @@ public class GameData {
             z = r.nextFloat() - 0.5f;
             
             grass.translate(new float[] {x*500, y*10, z*500});
+            grass.rotate(r.nextFloat()*180, new float[] {0, 1, 0});
         }
         
         // Buildings...?

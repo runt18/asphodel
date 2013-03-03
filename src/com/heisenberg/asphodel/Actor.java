@@ -19,6 +19,7 @@ public class Actor {
     // Transformation
     public float[] matTranslate;
     public float[] matRotate;
+    public float[] matScale;
     
     public float[] matToWorld;
     
@@ -31,9 +32,12 @@ public class Actor {
         
         matRotate = new float[16];
         matTranslate = new float[16];
+        matScale = new float[16];
         matToWorld = new float[16];
+        
         Matrix.setIdentityM(matRotate, 0);
         Matrix.setIdentityM(matTranslate, 0);
+        Matrix.setIdentityM(matScale, 0);
         
         GameData.addActor(this);
     }
@@ -42,7 +46,9 @@ public class Actor {
      * Calculates the full to world matrix transformation from stored components
      */
     public void calcToWorld() {
-        Matrix.multiplyMM(matToWorld, 0, matTranslate, 0, matRotate, 0);
+        float[] temp = new float[16];
+        Matrix.multiplyMM(temp, 0, matRotate, 0, matScale, 0);
+        Matrix.multiplyMM(matToWorld, 0, matTranslate, 0, temp, 0);
     }
     
     /*
@@ -51,6 +57,21 @@ public class Actor {
     public void translate(float[] vec3) {
         if (vec3.length != 3) throw new Error("Wrong number of fields in vector");
         Matrix.translateM(matTranslate, 0, vec3[0], vec3[1], vec3[2]);
+    }
+    
+    /*
+     * Rotates the actor, won't take effect until calcToWorld()
+     */
+    public void rotate(float angle, float[] axis) {
+        if (axis.length != 3) throw new Error("Wrong number of fields in vector");
+        Matrix.rotateM(matRotate, 0, angle, axis[0], axis[1], axis[2]);
+    }
+    
+    /*
+     * Scales the actor, won't take effect till calcToWorld()
+     */
+    public void scale(float sf) {
+        Matrix.scaleM(matScale, 0, sf, sf, sf);
     }
     
     /*
