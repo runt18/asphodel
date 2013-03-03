@@ -5,7 +5,7 @@ public class Joystick {
     public float[] start = new float[2];
     public boolean on = false;
     public float radius = 25;
-    public int pointerID = 0;
+    public int pointerID = -1;
     
     public float[] pos = new float[2];
     

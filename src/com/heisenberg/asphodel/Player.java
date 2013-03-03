@@ -78,14 +78,20 @@ public class Player implements OnTouchListener {
     // User input
     @Override
     public boolean onTouch(View view, MotionEvent e) {
-        switch (e.getAction()) {
+        switch (e.getAction() & MotionEvent.ACTION_MASK) {
         case MotionEvent.ACTION_MOVE:
             touchMove(e);
             break;
         case MotionEvent.ACTION_DOWN:
             touchDown(e);
             break;
+        case MotionEvent.ACTION_POINTER_DOWN:
+            touchDown(e);
+            break;
         case MotionEvent.ACTION_UP:
+            touchUp(e);
+            break;
+        case MotionEvent.ACTION_POINTER_UP:
             touchUp(e);
             break;
         }
@@ -103,10 +109,12 @@ public class Player implements OnTouchListener {
             if (e.getPointerId(i) == lJoy.pointerID) {
                 lJoy.pos[0] = x;
                 lJoy.pos[1] = y;
+                System.out.println("Move L "+e.getPointerId(i));
             }
-            else if (e.getPointerId(i) == rJoy.pointerID ) {
+            if (e.getPointerId(i) == rJoy.pointerID ) {
                 rJoy.pos[0] = x;
                 rJoy.pos[1] = y;
+                System.out.println("Move R "+e.getPointerId(i));
             }
         }
     }
@@ -114,50 +122,47 @@ public class Player implements OnTouchListener {
     private void touchDown(MotionEvent e) {
         float x, y;
         
-        for (int i = 0; i < e.getPointerCount(); i++) {
-            x = e.getX(i);
-            y = e.getY(i);
-            
-            if (x < GameData.width / 2) {
-                lJoy.start[0] = x;
-                lJoy.start[1] = y;
-                lJoy.pos[0] = x;
-                lJoy.pos[1] = y;
-                lJoy.on = true;
-                lJoy.pointerID = e.getPointerId(i);
-            }
-            else
-            {
-                rJoy.start[0] = x;
-                rJoy.start[1] = y;
-                rJoy.pos[0] = x;
-                rJoy.pos[1] = y;
-                rJoy.on = true;
-                rJoy.pointerID = e.getPointerId(i);
-            }
+        System.out.println("Down...");
+        int ind = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+        
+        x = e.getX(ind);
+        y = e.getY(ind);
+        
+        if (x < GameData.width / 2) {
+            lJoy.start[0] = x;
+            lJoy.start[1] = y;
+            lJoy.pos[0] = x;
+            lJoy.pos[1] = y;
+            lJoy.on = true;
+            lJoy.pointerID = e.getPointerId(ind);
+            System.out.println("...left");
+        }
+        else
+        {
+            rJoy.start[0] = x;
+            rJoy.start[1] = y;
+            rJoy.pos[0] = x;
+            rJoy.pos[1] = y;
+            rJoy.on = true;
+            rJoy.pointerID = e.getPointerId(ind);
+            System.out.println("...right");
         }
     }
     
     private void touchUp(MotionEvent e) {
-        if (e.getPointerId(0) == lJoy.pointerID) {
+        int ind = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+        
+        System.out.println("Up...");
+        
+        if (e.getPointerId(ind) == lJoy.pointerID) {
             lJoy.on = false;
             lJoy.pointerID = -1;
+            System.out.println("...left");
         }
-        else {
+        else if (e.getPointerId(ind) == rJoy.pointerID) {
             rJoy.on = false;
             rJoy.pointerID = -1;
+            System.out.println("...right");
         }
-        
-        // Left joystick
-        /*if (x < 50 && x < 50) {
-            lJoy.pos = new float[] {x - lJoy.center[0], y - lJoy.center[1]};
-        }
-        // Right joystick
-        else if (x > 125 && x < 175 && y < 50) {
-            rJoy.pos = new float[] {x - rJoy.center[0], y - rJoy.center[1]};
-        }
-        
-        lJoy.on = false;
-        rJoy.on = false;*/
     }
 }
