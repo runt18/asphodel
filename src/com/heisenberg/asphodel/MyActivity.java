@@ -26,7 +26,7 @@ public class MyActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
-        GameData.doInitialisation();
+        GameData.tryInitialisation();
         
         mView = new GLView(this);
         setContentView(mView);
