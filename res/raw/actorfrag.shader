@@ -11,7 +11,8 @@ uniform vec3 lDir;
 
 // Entry point
 void main() {
-    float d = max(dot(lDir, v_Normal), 0.0);
+    vec3 norm = normalize(v_Normal);
+    float d = max(dot(lDir, norm), 0.0);
     vec4 litCol = (d * v_Color * lDifCol) + (lAmbCol * v_Color);
     gl_FragColor = litCol;//vec4(v_Normal, 1.0);
 }
