@@ -41,7 +41,7 @@ public class TextureManager {
         options.inScaled = false;
         
         // Load the bitmap from resources
-        MyActivity act = MyActivity.getInstance();
+        MyActivity act = MyActivity.curActivity;
         Resources res = act.getResources();
         Bitmap bmp = BitmapFactory.decodeResource(res, resID);
         

@@ -79,7 +79,7 @@ public class Mesh {
         // Setup to read from the .DAE file (type of XML)
         InputStream is = null;
         try {
-            MyActivity act = MyActivity.getInstance();
+            MyActivity act = MyActivity.curActivity;
             is = act.getResources().openRawResource(meshID);
         }
         catch (NotFoundException e) {

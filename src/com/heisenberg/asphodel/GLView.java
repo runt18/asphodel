@@ -67,7 +67,7 @@ public class GLView extends GLSurfaceView {
     }
     
     public static String getShader(int id) {
-    	InputStream res = MyActivity.getInstance().getResources().openRawResource(id);
+    	InputStream res = MyActivity.curActivity.getResources().openRawResource(id);
     	BufferedReader br = new BufferedReader(new InputStreamReader(res));
     	StringBuilder sb = new StringBuilder();
     	try{

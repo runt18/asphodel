@@ -4,10 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.Display;
+import android.graphics.Point;
+import com.heisenberg.asphodel.Joystick;
 import com.heisenberg.asphodel.Vector2;
 
+
 public class MyActivity extends Activity {
-    private static MyActivity curActivity;
+    public static MyActivity curActivity;
+    static Joystick stick;
     
     /**
      * Our OpenGL View object
@@ -23,6 +28,7 @@ public class MyActivity extends Activity {
 
         // Store
         curActivity = this;
+        stick = new Joystick(getScreenSize());
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -32,12 +38,8 @@ public class MyActivity extends Activity {
         mView = new GLView(this);
         setContentView(mView);
     }
-    
-    public static MyActivity getInstance() {
-        return curActivity;
-    }
 
-    public static Vector2 getScreenSize(){
+    private Vector2 getScreenSize(){
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);

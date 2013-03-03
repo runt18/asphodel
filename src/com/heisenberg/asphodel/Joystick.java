@@ -4,8 +4,7 @@ public class Joystick {
     private Vector2 center;
     private Vector2 position;
 
-    public Joystick(){
-        Vector2 size = MyActivity.getScreenSize();
+    public Joystick(Vector2 size){
         this.center = size.multiply(0.75f);
         this.position = center;
     }
