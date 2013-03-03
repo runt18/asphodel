@@ -39,7 +39,8 @@ public class MyActivity extends Activity {
     
     private void stopApp(View view) {
     	wl.release();
-    	this.finish();
+    	this.onPause();
+    	this.onStop();
     }
     
     private EnergyPointProvider enablePP() {
