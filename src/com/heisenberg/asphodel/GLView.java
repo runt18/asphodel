@@ -15,16 +15,21 @@ public class GLView extends GLSurfaceView {
 
     public GLView(Context context) {
         super(context);
+        
         // Use our custom renderer
         setEGLContextClientVersion(2);
 //        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         renderer = new GLRenderer();
         setRenderer(renderer);
+        
+        // Player input
+        setOnTouchListener(GameData.player);
     }
     
     // Override UI methods here for input
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+<<<<<<< HEAD
         float x = e.getX();
         float y = e.getY();
 
@@ -36,16 +41,23 @@ public class GLView extends GLSurfaceView {
                 break;
         }
 
+=======
+>>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
         return true;
     }
     
     public static String getShader(int id) {
     	InputStream res = MyActivity.getInstance().getResources().openRawResource(id);
     	BufferedReader br = new BufferedReader(new InputStreamReader(res));
-    	StringBuilder sb = new StringBuilder();
+    	String str = "";
     	try{
-    		while(br.ready()) {
-    			sb.append(br.readLine());
+    	    int worked = 1;
+    		while(worked != -1) {
+    			char[] cBuf = new char[1];
+    			worked = br.read(cBuf, 0, 1);
+    			
+    			if (cBuf[0] != 0 && cBuf[0] != '\r')
+    			    str = str+cBuf[0];
     		}
     	} catch(IOException e) {
     		Log.e("Asphodel","Failed to load shader with id:"+id);
@@ -56,6 +68,7 @@ public class GLView extends GLSurfaceView {
 					Log.e("Asphodel","Failed to close shader with id:"+id);
 				}
     	}
-    	return sb.toString();
+    	System.out.println(str);
+    	return str.toString();
     }
 }

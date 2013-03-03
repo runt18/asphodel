@@ -1,6 +1,7 @@
 package com.heisenberg.asphodel;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -11,24 +12,8 @@ import android.opengl.GLSurfaceView.Renderer;
 
 public class GLRenderer implements Renderer {
     // Shaders
-    private final String vertexShaderCode =
-            "attribute vec3 vPosition;" +
-            "attribute vec3 vNormal;" +
-            "uniform vec4 vColor;" +
-            "uniform mat4 mvp_matrix;" +
-            "varying vec4 v_Color;" +
-            "void main() {" +
-            "  vec4 pos = vec4(vPosition[0], vPosition[1], vPosition[2], 1.0);" +
-            "  gl_Position = mvp_matrix * pos;" +
-            "  v_Color = vColor;" +
-            "}";
-
-    private final String fragmentShaderCode =
-            "precision mediump float;" +
-            "varying vec4 v_Color;" +
-            "void main() {" +
-            "  gl_FragColor = v_Color;" +
-            "}";
+    private final String vertexShaderCode = GLView.getShader(R.raw.actorvert);
+    private final String fragmentShaderCode = GLView.getShader(R.raw.actorfrag);
     
     private DrawHelper mDh;
     
@@ -38,15 +23,29 @@ public class GLRenderer implements Renderer {
     
     // View & projection matrices
     float[] matView, matProj;
+    
+    // Lighting
+    DirLight sun;
 
     public GLRenderer() {
         matView = new float[16];
         matProj = new float[16];
+<<<<<<< HEAD
         Matrix.setLookAtM(matView, 0, 0, 50, -120, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+=======
+        
+        sun = new DirLight();
+        sun.diffuseCol = new float[] {1.0f, 1.0f, 0.9f, 1.0f};
+        sun.ambientCol = new float[] {0.2f, 0.2f, 0.2f, 1.0f};
+        sun.dir = new float[] {1.0f, 0.5f, -1.0f};
+>>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
     }
     
     @Override
     public void onDrawFrame(GL10 gl) {
+        // Update the game
+        GameData.doUpdate();
+        
         // Blank background
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         
@@ -54,9 +53,9 @@ public class GLRenderer implements Renderer {
         tri.modelViewMatrix[13] = oy;
         tri.draw();*/
         
-        // Let's just draw one actor, yeah?
-        Actor actor = GameData.getActor(0);
+        // Draw all the actors
         
+<<<<<<< HEAD
         // Setup projection & view
 //        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 1000.0f);
         /*Matrix.setLookAtM(  matView, 0,
@@ -64,6 +63,15 @@ public class GLRenderer implements Renderer {
                             0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f);*/
 
+=======
+        // Setup view from player
+        float[] eye = GameData.player.eye;
+        float[] dir = GameData.player.dir;
+        
+        float[] targ = new float[] {eye[0]+dir[0],eye[1]+dir[1],eye[2]+dir[2]};
+        
+        Matrix.setLookAtM(matView, 0, eye[0], eye[1], eye[2], targ[0], targ[1], targ[2], 0f, 1.0f, 0.0f);
+>>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
         float[] matVP = new float[16];
         Matrix.multiplyMM(matVP, 0, matProj, 0, matView, 0);
         
@@ -73,8 +81,6 @@ public class GLRenderer implements Renderer {
         // Enable data arrays
         GLES20.glEnableVertexAttribArray(mDh.vertexHandle);
         GLES20.glEnableVertexAttribArray(mDh.normalHandle);
-        GLES20.glEnableVertexAttribArray(mDh.colorHandle);
-        GLES20.glEnableVertexAttribArray(mDh.matrixHandle);
         
         /*matVP = new float[]{
                 1, 0, 0, 0,
@@ -86,14 +92,32 @@ public class GLRenderer implements Renderer {
         // Set VP matrix
         mDh.matVP = matVP;
         
-        // Actor draws its own triangles
-        actor.draw(mDh);
+        // Set lighting
+        GLES20.glUniform4f( mDh.lDifColHandle,
+                            sun.diffuseCol[0],
+                            sun.diffuseCol[1],
+                            sun.diffuseCol[2],
+                            sun.diffuseCol[3]);
+        GLES20.glUniform4f( mDh.lAmbColHandle,
+                            sun.ambientCol[0],
+                            sun.ambientCol[1],
+                            sun.ambientCol[2],
+                            sun.ambientCol[3]);
+        GLES20.glUniform3f( mDh.lDirHandle,
+                            sun.dir[0],
+                            sun.dir[1],
+                            sun.dir[2]);
+        
+        // Actors draw their own triangles
+        ArrayList<Actor> actors = GameData.getActors();
+        
+        for (int i = 0; i < actors.size(); i++) {
+            actors.get(i).draw(mDh);
+        }
         
         // Disable data arrays
         GLES20.glDisableVertexAttribArray(mDh.vertexHandle);
         GLES20.glDisableVertexAttribArray(mDh.normalHandle);
-        GLES20.glDisableVertexAttribArray(mDh.colorHandle);
-        GLES20.glDisableVertexAttribArray(mDh.matrixHandle);
     }
     
     /**
@@ -117,7 +141,8 @@ public class GLRenderer implements Renderer {
         if (result.get(0) == GLES20.GL_FALSE) {
             // Dump information and stop
             String str = GLES20.glGetShaderInfoLog(shader);
-            throw new Error("Shader compilation failed: "+str);
+            String err = "Shader Compilation FAILED\n"+str+"\n"+shaderCode;
+            throw new Error(err);
         }
 
         return shader;
@@ -126,6 +151,9 @@ public class GLRenderer implements Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
+        
+        GameData.width = width;
+        GameData.height = height;
 
         float ratio = (float)width / (float)height;
         Matrix.perspectiveM(matProj, 0, 45.0f, ratio, 0.1f, 1000.0f);
@@ -136,9 +164,12 @@ public class GLRenderer implements Renderer {
         mDh = new DrawHelper();
         
         // General rendering settings
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glClearColor(0.8f, 0.8f, 1.0f, 1.0f);
         GLES20.glClearDepthf(1.0f);
-        tri = new Triangle();
+        
+        GLES20.glEnable( GLES20.GL_DEPTH_TEST );
+        GLES20.glDepthFunc( GLES20.GL_LEQUAL );
+        GLES20.glDepthMask( true );
         
         // Load the vertex and fragment shaders
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
@@ -146,17 +177,25 @@ public class GLRenderer implements Renderer {
         
         // Create an empty OpenGL ES Program
         mDh.program = GLES20.glCreateProgram();
+        
         // Add the shaders to the program
         GLES20.glAttachShader(mDh.program, vertexShader);
         GLES20.glAttachShader(mDh.program, fragmentShader);
+        
         // Create the OpenGL ES program executables
         GLES20.glLinkProgram(mDh.program);
         
         // Get handles for shader data
         mDh.vertexHandle = GLES20.glGetAttribLocation(mDh.program, "vPosition");
         mDh.normalHandle = GLES20.glGetAttribLocation(mDh.program, "vNormal");
+        
         mDh.colorHandle = GLES20.glGetUniformLocation(mDh.program, "vColor");
-        mDh.matrixHandle = GLES20.glGetUniformLocation(mDh.program, "mvp_matrix");
+        mDh.wvpHandle = GLES20.glGetUniformLocation(mDh.program, "matWVP");
+        mDh.witHandle = GLES20.glGetUniformLocation(mDh.program, "matWIT");
+        
+        mDh.lDifColHandle = GLES20.glGetUniformLocation(mDh.program, "lDifCol");
+        mDh.lAmbColHandle= GLES20.glGetUniformLocation(mDh.program, "lAmbCol");
+        mDh.lDirHandle = GLES20.glGetUniformLocation(mDh.program, "lDir");
     }
 
 }

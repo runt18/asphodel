@@ -31,9 +31,6 @@ public class SubMesh {
     }
 
     public void draw(DrawHelper dh) {
-        // Set the color
-        GLES20.glUniform4f(dh.colorHandle, 1.0f, 0.5f, 0.5f, 1.0f);
-        
         // Send in vertex positions
         vb.position(0);
         GLES20.glVertexAttribPointer(dh.vertexHandle, 3, GLES20.GL_FLOAT, false, 0, vb);

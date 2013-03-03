@@ -22,12 +22,18 @@ public class Actor {
     
     public float[] matToWorld;
     
+    // Color
+    public float[] color = new float[] {1.0f, 0.5f, 0.5f, 1.0f};
+    
     public Actor(int meshID) {
         mMesh = new Mesh(meshID);
         id = "Actor" + meshID;
         
         matRotate = new float[16];
+        matTranslate = new float[16];
+        matToWorld = new float[16];
         Matrix.setIdentityM(matRotate, 0);
+        Matrix.setIdentityM(matTranslate, 0);
         
         GameData.addActor(this);
     }
@@ -47,14 +53,35 @@ public class Actor {
         Matrix.translateM(matTranslate, 0, vec3[0], vec3[1], vec3[2]);
     }
     
+    /*
+     * Do game stuff. Fill with awesome game code, maybe in subclasses?
+     */
+    public void update() {
+        // Does nothing but calcToWorld
+        calcToWorld();
+    }
+    
+    /*
+     * Displays the actor. Called by GLRenderer
+     */
     public void draw(DrawHelper mDh) {
         // Set the wvp matrix
         float[] wvp = new float[16];
-        Matrix.rotateM(matRotate, 0, 5, 0, 1, 0);
-        Matrix.multiplyMM(wvp, 0, mDh.matVP, 0, matRotate, 0);
+        Matrix.multiplyMM(wvp, 0, mDh.matVP, 0, matToWorld, 0);
+        GLES20.glUniformMatrix4fv(mDh.wvpHandle, 1, false, wvp, 0);
         
-        GLES20.glUniformMatrix4fv(mDh.matrixHandle, 1, false, wvp, 0);
+        // Set world-inverse-transpose matrix
+        // Identity is fine for now
+        float[] wi = new float[16];
+        float[] wit = new float[16];
+        Matrix.invertM(wi, 0, matToWorld, 0);
+        Matrix.transposeM(wit, 0, wi, 0);
+        GLES20.glUniformMatrix4fv(mDh.witHandle, 1, false, wit, 0);
         
+        // Set drawing color
+        GLES20.glUniform4f(mDh.colorHandle, color[0], color[1], color[2], color[3]);
+        
+        // Draw the actor's mesh
         mMesh.draw(mDh);
     }
 
