@@ -10,6 +10,7 @@ public class GameData {
     // Data
     private static HashMap<String, Mesh> meshes;
     private static ArrayList<Actor> actors;
+    private static ArrayList<Actor> orbs;
     public static Player player;
     public static float width, height;
     
@@ -34,6 +35,7 @@ public class GameData {
         TextureManager.init();
         meshes = new HashMap<String, Mesh>();
         actors = new ArrayList<Actor>();
+        orbs = new ArrayList<Actor>();
         
         player = new Player();
         
@@ -70,6 +72,10 @@ public class GameData {
             
             grass.translate(new float[] {x*500, y*10, z*500});
         }
+
+        for(int i = 0; i < 10; i++){
+            orbs.add(new Orb());
+        }
         
         // Buildings...?
         Actor a = new Actor(R.raw.shapes);
@@ -100,8 +106,16 @@ public class GameData {
 
     public static void doUpdate() {
         player.update();
+
+        if(new Random().nextFloat() > 0.99f){
+            orbs.add(new Orb());
+        }
+
         for (Actor a : actors) {
             a.update();
+        }
+        for(Actor o : orbs){
+            o.update();
         }
     }
 }

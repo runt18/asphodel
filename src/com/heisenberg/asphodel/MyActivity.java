@@ -39,14 +39,10 @@ public class MyActivity extends Activity {
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-<<<<<<< HEAD
         EnergyPointProvider epp = enablePP();
-        GameData.doInitialisation();
-=======
-        
+
         GameData.tryInitialisation();
-        
->>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
+
         mView = new GLView(this);
         setContentView(mView);
     }

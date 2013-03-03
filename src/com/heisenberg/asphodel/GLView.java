@@ -29,7 +29,6 @@ public class GLView extends GLSurfaceView {
     // Override UI methods here for input
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-<<<<<<< HEAD
         float x = e.getX();
         float y = e.getY();
 
@@ -41,8 +40,6 @@ public class GLView extends GLSurfaceView {
                 break;
         }
 
-=======
->>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
         return true;
     }
     
