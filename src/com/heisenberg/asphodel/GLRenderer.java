@@ -33,7 +33,7 @@ public class GLRenderer implements Renderer {
         
         sun = new DirLight();
         sun.diffuseCol = new float[] {1.0f, 1.0f, 0.9f, 1.0f};
-        sun.ambientCol = new float[] {0.2f, 0.2f, 0.2f, 1.0f};
+        sun.ambientCol = new float[] {0.4f, 0.4f, 0.4f, 1.0f};
         sun.dir = new float[] {1.0f, 0.5f, -1.0f};
     }
     
