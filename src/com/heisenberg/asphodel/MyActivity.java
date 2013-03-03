@@ -1,43 +1,45 @@
 package com.heisenberg.asphodel;
 
-import com.heisenberg.asphodel.energy.AsphodelPointProvider;
-import com.heisenberg.asphodel.energy.EnergyPointProvider;
-
 import android.app.Activity;
 import android.content.Context;
-import android.location.LocationListener;
+import android.content.Intent;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
+import android.os.PowerManager;
+import android.view.View;
+
+import com.heisenberg.asphodel.energy.AsphodelPointProvider;
+import com.heisenberg.asphodel.energy.EnergyPointProvider;
 
 public class MyActivity extends Activity {
     public static final String LOGTAG = "Asphodel";
     private static MyActivity curActivity;
+    private static PowerManager.WakeLock wl;
     
-    /**
-     * Our OpenGL View object
-     */
-    private GLView mView;
-    
-    /**
-     * Called when the activity is first created.
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.main);
         // Store
         curActivity = this;
         
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
+        PowerManager pm = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK, LOGTAG);
+        wl.acquire();
         EnergyPointProvider epp = enablePP();
-        GameData.doInitialisation();
-        mView = new GLView(this);
-        setContentView(mView);
+    }
+    
+    public void startGLStuff(View view) {
+    	Intent intent = new Intent(this,RunGLView.class);
+    	startActivity(intent);
+    }
+    
+    private void stopApp(View view) {
+    	wl.release();
+    	this.finish();
     }
     
     private EnergyPointProvider enablePP() {
