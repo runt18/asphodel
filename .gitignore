@@ -15,3 +15,5 @@ Project/default.properties
 Project/gen/R.java.d
 Project/local.properties
 Project/proguard-project.txt
+
+.DS_Store
