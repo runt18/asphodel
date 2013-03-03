@@ -37,4 +37,8 @@ public class GameData {
     public static Actor getActor(int i) {
         return actors.get(i);
     }
+
+    public static ArrayList<Actor> getActors() {
+        return actors;
+    }
 }

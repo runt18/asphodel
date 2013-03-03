@@ -68,10 +68,15 @@ public class GLView extends GLSurfaceView {
     public static String getShader(int id) {
     	InputStream res = MyActivity.getInstance().getResources().openRawResource(id);
     	BufferedReader br = new BufferedReader(new InputStreamReader(res));
-    	StringBuilder sb = new StringBuilder();
+    	String str = "";
     	try{
-    		while(br.ready()) {
-    			sb.append(br.readLine());
+    	    int worked = 1;
+    		while(worked != -1) {
+    			char[] cBuf = new char[1];
+    			worked = br.read(cBuf, 0, 1);
+    			
+    			if (cBuf[0] != 0 && cBuf[0] != '\r')
+    			    str = str+cBuf[0];
     		}
     	} catch(IOException e) {
     		Log.e("Asphodel","Failed to load shader with id:"+id);
@@ -82,6 +87,7 @@ public class GLView extends GLSurfaceView {
 					Log.e("Asphodel","Failed to close shader with id:"+id);
 				}
     	}
-    	return sb.toString();
+    	System.out.println(str);
+    	return str.toString();
     }
 }
