@@ -42,6 +42,7 @@ public class GLRenderer implements Renderer {
     public GLRenderer() {
         matView = new float[16];
         matProj = new float[16];
+        Matrix.setLookAtM(matView, 0, 0, 50, -120, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
     }
     
     @Override
@@ -57,12 +58,12 @@ public class GLRenderer implements Renderer {
         Actor actor = GameData.getActor(0);
         
         // Setup projection & view
-        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 1000.0f);
+//        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 1000.0f);
         /*Matrix.setLookAtM(  matView, 0,
                             0.0f, 0.0f, -5.0f,
                             0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f);*/
-        Matrix.setLookAtM(matView, 0, 0, 50, -120, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
         float[] matVP = new float[16];
         Matrix.multiplyMM(matVP, 0, matProj, 0, matView, 0);
         
@@ -127,7 +128,7 @@ public class GLRenderer implements Renderer {
         GLES20.glViewport(0, 0, width, height);
 
         float ratio = (float)width / (float)height;
-        Matrix.perspectiveM(matProj, 0, 45.0f, ratio, 0.1f, 100.0f);
+        Matrix.perspectiveM(matProj, 0, 45.0f, ratio, 0.1f, 1000.0f);
     }
 
     @Override

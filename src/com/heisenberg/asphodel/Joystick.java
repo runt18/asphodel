@@ -12,4 +12,9 @@ public class Joystick {
     public Vector2 getOffset(){
         return position.lerp(center, 1);
     }
+
+    public void update(float x, float y){
+        this.position.x = x;
+        this.position.y = y;
+    }
 }

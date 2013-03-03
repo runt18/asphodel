@@ -1,5 +1,7 @@
 package com.heisenberg.asphodel;
 
+import android.opengl.Matrix;
+
 public class Camera {
     Vector3 position;
     Vector3 velocity;
@@ -13,5 +15,6 @@ public class Camera {
 
     public void update(){
         this.position = position.add(velocity);
+
     }
 }
