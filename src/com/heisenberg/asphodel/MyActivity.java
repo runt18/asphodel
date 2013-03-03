@@ -1,7 +1,15 @@
 package com.heisenberg.asphodel;
 
+import com.heisenberg.asphodel.energy.AsphodelPointProvider;
+import com.heisenberg.asphodel.energy.EnergyPointProvider;
+
 import android.app.Activity;
+import android.content.Context;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.Display;
@@ -11,8 +19,8 @@ import com.heisenberg.asphodel.Vector2;
 
 
 public class MyActivity extends Activity {
-    public static MyActivity curActivity;
-    static Joystick stick;
+    public static final String LOGTAG = "Asphodel";
+    private static MyActivity curActivity;
     
     /**
      * Our OpenGL View object
@@ -28,13 +36,11 @@ public class MyActivity extends Activity {
 
         // Store
         curActivity = this;
-        stick = new Joystick(getScreenSize());
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        
+        EnergyPointProvider epp = enablePP();
         GameData.doInitialisation();
-        
         mView = new GLView(this);
         setContentView(mView);
     }
@@ -44,5 +50,15 @@ public class MyActivity extends Activity {
         Point size = new Point();
         display.getSize(size);
         return new Vector2(size.x, size.y);
+    }
+    
+    private EnergyPointProvider enablePP() {
+    	LocationManager locationManager =
+                (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    	return new AsphodelPointProvider(locationManager);
+    }
+
+    public static MyActivity getInstance() {
+        return curActivity;
     }
 }
