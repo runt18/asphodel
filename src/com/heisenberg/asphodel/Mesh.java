@@ -41,10 +41,23 @@ public class Mesh {
     // Corresponding Resource ID
     private int meshID;
     
+    // ID for hashing
+    public String id;
+    
     // Constructor calls file load
     public Mesh(int resID) {
-        subMeshes = new ArrayList<SubMesh>();
         meshID = resID;
+        id = "Mesh"+meshID;
+        
+        // Use existing submeshes if there's a match
+        Mesh old = GameData.getMesh(id);
+        if (old != null && old.meshID == meshID) {
+            subMeshes = old.subMeshes;
+            return;
+        }
+        
+        // Otherwise load from resources
+        subMeshes = new ArrayList<SubMesh>();
         
         if (resID != -3) {
             System.out.println("Trying to load DAE");
@@ -63,7 +76,7 @@ public class Mesh {
             sm.setVertexBuffer(fb);
         }
         
-        GameData.addMesh(this);
+        GameData.addMesh(id, this);
     }
     
     // Rendering code

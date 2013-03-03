@@ -34,7 +34,7 @@ public class GLRenderer implements Renderer {
         sun = new DirLight();
         sun.diffuseCol = new float[] {1.0f, 1.0f, 0.9f, 1.0f};
         sun.ambientCol = new float[] {0.2f, 0.2f, 0.2f, 1.0f};
-        sun.dir = new float[] {1.0f, 1.0f, 1.0f};
+        sun.dir = new float[] {1.0f, 0.5f, -1.0f};
     }
     
     @Override
@@ -51,13 +51,13 @@ public class GLRenderer implements Renderer {
         
         // Draw all the actors
         
-        // Setup projection & view
-        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 1000.0f);
-        /*Matrix.setLookAtM(  matView, 0,
-                            0.0f, 0.0f, -5.0f,
-                            0.0f, 0.0f, 0.0f,
-                            0.0f, 1.0f, 0.0f);*/
-        Matrix.setLookAtM(matView, 0, 0, 50, -120, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        // Setup view from player
+        float[] eye = GameData.player.eye;
+        float[] dir = GameData.player.dir;
+        
+        float[] targ = new float[] {eye[0]+dir[0],eye[1]+dir[1],eye[2]+dir[2]};
+        
+        Matrix.setLookAtM(matView, 0, eye[0], eye[1], eye[2], targ[0], targ[1], targ[2], 0f, 1.0f, 0.0f);
         float[] matVP = new float[16];
         Matrix.multiplyMM(matVP, 0, matProj, 0, matView, 0);
         
@@ -137,9 +137,12 @@ public class GLRenderer implements Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
+        
+        GameData.width = width;
+        GameData.height = height;
 
         float ratio = (float)width / (float)height;
-        Matrix.perspectiveM(matProj, 0, 45.0f, ratio, 0.1f, 100.0f);
+        Matrix.perspectiveM(matProj, 0, 45.0f, ratio, 0.1f, 1000.0f);
     }
 
     @Override
