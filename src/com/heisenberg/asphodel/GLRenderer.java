@@ -159,7 +159,7 @@ public class GLRenderer implements Renderer {
         mDh = new DrawHelper();
         
         // General rendering settings
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glClearColor(0.8f, 0.8f, 1.0f, 1.0f);
         GLES20.glClearDepthf(1.0f);
         
         GLES20.glEnable( GLES20.GL_DEPTH_TEST );

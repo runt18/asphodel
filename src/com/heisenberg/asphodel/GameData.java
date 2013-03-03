@@ -29,7 +29,10 @@ public class GameData {
         meshes = new ArrayList<Mesh>();
         actors = new ArrayList<Actor>();
         
-        // Try making an actor
+        // Crappy terrain
+        Actor terrain = new Actor(R.raw.terrain);
+        terrain.color = new float[] {0.5f, 1, 0.5f, 1};
+        
         Actor a = new Actor(R.raw.shapes);
         a.translate(new float[] {20, 0, 30});
         
