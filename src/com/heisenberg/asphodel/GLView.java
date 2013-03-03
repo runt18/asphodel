@@ -5,20 +5,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import android.content.Context;
+import android.opengl.Matrix;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.opengl.GLSurfaceView;
 
 public class GLView extends GLSurfaceView {
-    private float prevX = 0;
-    private float prevY = 0;
     private GLRenderer renderer;
-	
+
     public GLView(Context context) {
         super(context);
         
         // Use our custom renderer
         setEGLContextClientVersion(2);
+//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         renderer = new GLRenderer();
         setRenderer(renderer);
         
@@ -29,6 +29,20 @@ public class GLView extends GLSurfaceView {
     // Override UI methods here for input
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+<<<<<<< HEAD
+        float x = e.getX();
+        float y = e.getY();
+
+//        Log.i("POSITION", "" + x);
+
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_MOVE:
+                Matrix.translateM(renderer.matView, 0, y + 0.001f, 0, x + 0.001f);
+                break;
+        }
+
+=======
+>>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
         return true;
     }
     

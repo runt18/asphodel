@@ -30,11 +30,15 @@ public class GLRenderer implements Renderer {
     public GLRenderer() {
         matView = new float[16];
         matProj = new float[16];
+<<<<<<< HEAD
+        Matrix.setLookAtM(matView, 0, 0, 50, -120, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+=======
         
         sun = new DirLight();
         sun.diffuseCol = new float[] {1.0f, 1.0f, 0.9f, 1.0f};
         sun.ambientCol = new float[] {0.2f, 0.2f, 0.2f, 1.0f};
         sun.dir = new float[] {1.0f, 0.5f, -1.0f};
+>>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
     }
     
     @Override
@@ -51,6 +55,15 @@ public class GLRenderer implements Renderer {
         
         // Draw all the actors
         
+<<<<<<< HEAD
+        // Setup projection & view
+//        Matrix.perspectiveM(matProj, 0, 45.0f, 1.0f, 0.1f, 1000.0f);
+        /*Matrix.setLookAtM(  matView, 0,
+                            0.0f, 0.0f, -5.0f,
+                            0.0f, 0.0f, 0.0f,
+                            0.0f, 1.0f, 0.0f);*/
+
+=======
         // Setup view from player
         float[] eye = GameData.player.eye;
         float[] dir = GameData.player.dir;
@@ -58,6 +71,7 @@ public class GLRenderer implements Renderer {
         float[] targ = new float[] {eye[0]+dir[0],eye[1]+dir[1],eye[2]+dir[2]};
         
         Matrix.setLookAtM(matView, 0, eye[0], eye[1], eye[2], targ[0], targ[1], targ[2], 0f, 1.0f, 0.0f);
+>>>>>>> e9643108a6c52ab47f922c0eb47216920383e5de
         float[] matVP = new float[16];
         Matrix.multiplyMM(matVP, 0, matProj, 0, matView, 0);
         

@@ -9,7 +9,8 @@ gen
 bin/
 *.skb
 
-# NBAndroid stuff
+.DS_Store
+
 nbandroid/
 ant.properties
 build.properties
