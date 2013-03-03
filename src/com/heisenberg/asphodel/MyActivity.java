@@ -15,8 +15,9 @@ import android.view.WindowManager;
 
 public class MyActivity extends Activity {
     public static final String LOGTAG = "Asphodel";
+    private static MyActivity curActivity;
     
-	/**
+    /**
      * Our OpenGL View object
      */
     private GLView mView;
@@ -27,19 +28,25 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Store
+        curActivity = this;
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         EnergyPointProvider epp = enablePP();
+        GameData.doInitialisation();
         mView = new GLView(this);
         setContentView(mView);
-        
-        
     }
     
     private EnergyPointProvider enablePP() {
     	LocationManager locationManager =
                 (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     	return new AsphodelPointProvider(locationManager);
+    }
+    
+    public static MyActivity getInstance() {
+        return curActivity;
     }
 }
